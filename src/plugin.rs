@@ -8,6 +8,7 @@ use crate::capabilities::HeartOnCapabilities;
 use crate::budget::HeartOnBudget;
 use crate::hud::HeartOnHudPlugin;
 use crate::simd::HeartOnSimdCapabilities;
+use crate::voxel::VoxelRendererPlugin;
 
 #[derive(Debug, Clone)]
 pub struct HeartOnPublicSettings {
@@ -59,6 +60,8 @@ impl Plugin for HeartOnPublicPlugin {
         if self.settings.enable_hud {
             app.add_plugins(HeartOnHudPlugin);
         }
+        
+        app.add_plugins(VoxelRendererPlugin);
         
         app.add_systems(Startup, log_engine_info);
     }
