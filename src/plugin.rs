@@ -7,7 +7,7 @@ use bevy_ecs::prelude::*;
 use crate::capabilities::HeartOnCapabilities;
 use crate::budget::HeartOnBudget;
 use crate::hud::HeartOnHudPlugin;
-use crate::voxel::DummyVoxelPlugin;
+use crate::simd::HeartOnSimdCapabilities;
 
 #[derive(Debug, Clone)]
 pub struct HeartOnPublicSettings {
@@ -21,7 +21,7 @@ impl Default for HeartOnPublicSettings {
         Self {
             enable_hud: true,
             enable_budget_tracking: true,
-            budget_history_size: 100,
+            budget_history_size: 60,
         }
     }
 }
@@ -46,33 +46,46 @@ impl HeartOnPublicPlugin {
 
 impl Plugin for HeartOnPublicPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(HeartOnCapabilities::detect());
-
+        let caps = HeartOnCapabilities::detect();
+        let simd_caps = HeartOnSimdCapabilities::detect();
+        
+        app.insert_resource(caps);
+        app.insert_resource(simd_caps);
+        
         if self.settings.enable_budget_tracking {
             app.insert_resource(HeartOnBudget::new(self.settings.budget_history_size));
         }
-
+        
         if self.settings.enable_hud {
             app.add_plugins(HeartOnHudPlugin);
         }
-
-        app.add_plugins(DummyVoxelPlugin);
-
-        app.add_systems(Startup, log_hearton_info);
+        
+        app.add_systems(Startup, log_engine_info);
     }
 }
 
-fn log_hearton_info(capabilities: Res<HeartOnCapabilities>) {
-    println!("=== HeartOn Engine ===");
-    println!("Version: {}", crate::version::HEARTON_VERSION);
-    println!("Bevy: {}", crate::version::BEVY_VERSION);
-    println!("Edition: Community (MIT)");
-    println!("Vulkan: {:?}", capabilities.vulkan_version);
-    println!("Max Voxels: {}", capabilities.max_voxels);
-    println!("Task Shaders: {}", capabilities.supports_task_shaders);
-    println!("Mesh Shaders: {}", capabilities.supports_mesh_shaders);
-    println!("NRC: {}", capabilities.supports_nrc);
-    println!("======================");
+fn log_engine_info(
+    caps: Res<HeartOnCapabilities>,
+    simd_caps: Res<HeartOnSimdCapabilities>,
+) {
+    println!("=== HeartOn Engine Community Edition ===");
+    println!("Version: {}", crate::HEARTON_VERSION);
+    println!("Bevy: {}", crate::BEVY_VERSION);
+    println!("Edition: Community (MIT License)");
+    println!();
+    println!("Capabilities:");
+    println!("  Vulkan: {:?}", caps.vulkan_version);
+    println!("  Max Voxels: {}", caps.max_voxels);
+    println!();
+    println!("SIMD:");
+    println!("  Path: {}", simd_caps.path_name());
+    println!("  Has SIMD: {}", simd_caps.has_simd());
+    println!("  Expected Speedup: {:.1}x", simd_caps.expected_speedup());
+    println!("  AVX-512: {}", simd_caps.has_avx512);
+    println!("  AVX2: {}", simd_caps.has_avx2);
+    println!("  SSE4.2: {}", simd_caps.has_sse42);
+    println!("  NEON: {}", simd_caps.has_neon);
+    println!("=========================================");
 }
 
 #[cfg(test)]
@@ -84,7 +97,7 @@ mod tests {
         let settings = HeartOnPublicSettings::default();
         assert!(settings.enable_hud);
         assert!(settings.enable_budget_tracking);
-        assert_eq!(settings.budget_history_size, 100);
+        assert_eq!(settings.budget_history_size, 60);
     }
 
     #[test]
@@ -97,12 +110,14 @@ mod tests {
     fn plugin_with_custom_settings() {
         let settings = HeartOnPublicSettings {
             enable_hud: false,
-            enable_budget_tracking: true,
-            budget_history_size: 50,
+            enable_budget_tracking: false,
+            budget_history_size: 120,
         };
         let plugin = HeartOnPublicPlugin::new(settings);
+        
         assert!(!plugin.settings.enable_hud);
-        assert_eq!(plugin.settings.budget_history_size, 50);
+        assert!(!plugin.settings.enable_budget_tracking);
+        assert_eq!(plugin.settings.budget_history_size, 120);
     }
 
     #[test]
@@ -111,6 +126,7 @@ mod tests {
         app.add_plugins(HeartOnPublicPlugin::default());
         
         assert!(app.world.contains_resource::<HeartOnCapabilities>());
+        assert!(app.world.contains_resource::<HeartOnSimdCapabilities>());
         assert!(app.world.contains_resource::<HeartOnBudget>());
     }
 }
