@@ -255,7 +255,7 @@ mod tests {
         let mut recording = CameraPathRecording::default();
         recording.start_recording();
 
-        recording.record_input(InputType::KeyPress(KeyCode::KeyW));
+        recording.record_input(InputType::KeyPress("W".to_string()));
 
         assert_eq!(recording.inputs.len(), 1);
         assert_eq!(recording.inputs[0].frame, 0);
@@ -302,7 +302,7 @@ mod tests {
         let mut recording = CameraPathRecording::default();
         recording.start_recording();
         recording.record_camera_frame(Vec3::new(1.0, 2.0, 3.0), Quat::IDENTITY);
-        recording.record_input(InputType::KeyPress(KeyCode::KeyW));
+        recording.record_input(InputType::KeyPress("W".to_string()));
 
         let path = "/tmp/test_replay.ron";
         recording.save_to_ron(path).unwrap();
