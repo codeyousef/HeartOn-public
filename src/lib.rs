@@ -1,8 +1,20 @@
 // HeartOn Public API
 // MIT Licensed
 
-pub fn version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
+pub mod version;
+pub mod capabilities;
+pub mod budget;
+pub mod hud;
+pub mod voxel;
+pub mod plugin;
+
+pub use version::{HEARTON_VERSION, BEVY_VERSION};
+pub use capabilities::HeartOnCapabilities;
+pub use budget::HeartOnBudget;
+pub use plugin::{HeartOnPublicPlugin, HeartOnPublicSettings};
+
+pub fn engine_version() -> &'static str {
+    version::HEARTON_VERSION
 }
 
 #[cfg(test)]
@@ -11,6 +23,6 @@ mod tests {
 
     #[test]
     fn it_works() {
-        assert_eq!(version(), "0.1.0");
+        assert_eq!(engine_version(), "0.13.2-hearton.1");
     }
 }

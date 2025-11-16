@@ -6,9 +6,19 @@ license = "MIT"
 description = "HeartOn public bridge API"
 
 [dependencies]
-# This will be populated when the repo is created
-# bevy = { workspace = true }
+bevy_app = { path = "../bevy/crates/bevy_app" }
+bevy_ecs = { path = "../bevy/crates/bevy_ecs" }
+bevy_render = { path = "../bevy/crates/bevy_render" }
+bevy_ui = { path = "../bevy/crates/bevy_ui" }
+bevy_core = { path = "../bevy/crates/bevy_core" }
+bevy_time = { path = "../bevy/crates/bevy_time" }
+bevy_asset = { path = "../bevy/crates/bevy_asset" }
+bevy_text = { path = "../bevy/crates/bevy_text" }
+bevy_hierarchy = { path = "../bevy/crates/bevy_hierarchy" }
 
 [lib]
 name = "hearton_public"
 path = "src/lib.rs"
+
+[lints]
+workspace = true
