@@ -1,0 +1,14 @@
+[package]
+name = "hearton_public"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "HeartOn public bridge API"
+
+[dependencies]
+# This will be populated when the repo is created
+# bevy = { workspace = true }
+
+[lib]
+name = "hearton_public"
+path = "src/lib.rs"
