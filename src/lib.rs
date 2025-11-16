@@ -10,6 +10,7 @@ pub mod plugin;
 pub mod simd;
 pub mod postfx;
 pub mod platform;
+pub mod replay;
 
 pub use version::{HEARTON_VERSION, BEVY_VERSION};
 pub use capabilities::{HeartOnCapabilities, VulkanVersion};
@@ -20,6 +21,7 @@ pub use voxel::MAX_VOXELS_COMMUNITY;
 pub use plugin::{HeartOnPublicPlugin, HeartOnPublicSettings};
 pub use simd::{HeartOnSimdCapabilities, SimdPath, SimdF32x4, SimdVec3x4, SimdAabbx4};
 pub use postfx::{PostFxConfig, PostFxBudget, HeartOnPostFxPublicPlugin};
+pub use replay::{ReplayPlugin, CameraPathRecording, CameraPathPlayback};
 
 pub mod prelude {
     pub use crate::{

@@ -16,8 +16,13 @@ bevy_asset = { path = "../bevy/crates/bevy_asset" }
 bevy_text = { path = "../bevy/crates/bevy_text" }
 bevy_hierarchy = { path = "../bevy/crates/bevy_hierarchy" }
 bevy_reflect = { path = "../bevy/crates/bevy_reflect" }
+bevy_input = { path = "../bevy/crates/bevy_input" }
+bevy_transform = { path = "../bevy/crates/bevy_transform" }
+bevy_math = { path = "../bevy/crates/bevy_math" }
+bevy_log = { path = "../bevy/crates/bevy_log" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+ron = "0.8"
 
 [lib]
 name = "hearton_public"
