@@ -11,6 +11,7 @@ pub mod simd;
 pub mod postfx;
 pub mod platform;
 pub mod replay;
+pub mod bench;
 
 pub use version::{HEARTON_VERSION, BEVY_VERSION};
 pub use capabilities::{HeartOnCapabilities, VulkanVersion};

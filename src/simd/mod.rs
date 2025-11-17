@@ -3,9 +3,11 @@
 
 pub mod types;
 pub mod soa;
+pub mod visibility;
 
 pub use types::{SimdF32x4, SimdPath};
-pub use soa::{SimdVec3x4, SimdAabbx4};
+pub use soa::{SimdVec3x4, SimdAabbx4, frustum_cull_aabbs};
+pub use visibility::{SimdVisibilityStats, simd_visibility_system};
 
 use bevy_ecs::system::Resource;
 
