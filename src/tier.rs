@@ -44,9 +44,9 @@ pub fn current_tier() -> Tier {
 /// Get maximum voxel count for current tier
 pub fn max_voxels() -> usize {
     match current_tier() {
-        Tier::Community => 10_000_000,      // 10M voxels
-        Tier::Indie => 1_000_000_000,       // 1B voxels
-        Tier::Studio => usize::MAX,         // Unlimited
+        Tier::Community => 10_000_000, // 10M voxels
+        Tier::Indie => 1_000_000_000,  // 1B voxels
+        Tier::Studio => usize::MAX,    // Unlimited
     }
 }
 
@@ -72,7 +72,7 @@ mod tests {
     fn test_voxel_limits() {
         let community_max = 10_000_000;
         let indie_max = 1_000_000_000;
-        
+
         assert!(community_max < indie_max);
         assert!(max_voxels() > 0);
     }
