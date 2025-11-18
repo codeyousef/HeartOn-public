@@ -8,6 +8,7 @@
 pub mod budget;
 pub mod capabilities;
 pub mod debug;
+pub mod hud;
 pub mod metrics;
 pub mod plugin;
 pub mod tier;
