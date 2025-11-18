@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-//! Tier detection and enforcement for HeartOn Engine
+//! Tier detection and enforcement for `HeartOn` Engine
 //!
 //! Provides zero-overhead tier detection via environment variable.
 
 use once_cell::sync::Lazy;
 
-/// HeartOn licensing tier
+/// `HeartOn` licensing tier
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Tier {
     /// Community Edition - MIT licensed, 10M voxel limit
@@ -16,7 +16,18 @@ pub enum Tier {
     Studio,
 }
 
-/// Current tier detected from HEARTON_TIER environment variable
+impl Tier {
+    /// Get the name of this tier
+    pub fn name(self) -> &'static str {
+        match self {
+            Tier::Community => "Community",
+            Tier::Indie => "Indie",
+            Tier::Studio => "Studio",
+        }
+    }
+}
+
+/// Current tier detected from `HEARTON_TIER` environment variable
 ///
 /// Set via: `export HEARTON_TIER=indie` or `HEARTON_TIER=studio`
 /// Defaults to Community if unset or invalid.

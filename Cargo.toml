@@ -10,6 +10,8 @@ bevy = { workspace = true }
 once_cell = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
+wgpu = { workspace = true }
+pollster = "0.3"
 
 [lints]
 workspace = true
