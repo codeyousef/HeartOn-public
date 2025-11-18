@@ -3,47 +3,13 @@ name = "hearton_public"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-description = "HeartOn public bridge API"
+description = "HeartOn Engine - MIT-licensed public layer"
 
 [dependencies]
-bevy_app = { path = "../bevy/crates/bevy_app" }
-bevy_ecs = { path = "../bevy/crates/bevy_ecs" }
-bevy_render = { path = "../bevy/crates/bevy_render" }
-bevy_ui = { path = "../bevy/crates/bevy_ui" }
-bevy_core = { path = "../bevy/crates/bevy_core" }
-bevy_time = { path = "../bevy/crates/bevy_time" }
-bevy_asset = { path = "../bevy/crates/bevy_asset" }
-bevy_text = { path = "../bevy/crates/bevy_text" }
-bevy_hierarchy = { path = "../bevy/crates/bevy_hierarchy" }
-bevy_reflect = { path = "../bevy/crates/bevy_reflect" }
-bevy_input = { path = "../bevy/crates/bevy_input" }
-bevy_transform = { path = "../bevy/crates/bevy_transform" }
-bevy_math = { path = "../bevy/crates/bevy_math" }
-bevy_log = { path = "../bevy/crates/bevy_log" }
-bevy_pbr = { path = "../bevy/crates/bevy_pbr" }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-ron = "0.8"
+bevy = { workspace = true }
+once_cell = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
 
-[dev-dependencies]
-bevy = { path = "../bevy", default-features = false, features = ["bevy_winit", "bevy_pbr", "x11"] }
-
-[lib]
-name = "hearton_public"
-path = "src/lib.rs"
-
-[lints.rust]
-unsafe_op_in_unsafe_fn = "warn"
-missing_docs = "warn"
-dangerous_implicit_autorefs = "allow"
-
-[lints.clippy]
-type_complexity = "allow"
-doc_markdown = "warn"
-manual_let_else = "warn"
-undocumented_unsafe_blocks = "warn"
-redundant_else = "warn"
-match_same_arms = "warn"
-semicolon_if_nothing_returned = "warn"
-ptr_as_ptr = "warn"
-ptr_cast_constness = "warn"
+[lints]
+workspace = true
