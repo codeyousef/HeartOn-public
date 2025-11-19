@@ -5,7 +5,6 @@ use bevy::prelude::*;
 use std::collections::VecDeque;
 use std::fs::File;
 use std::io::Write;
-use chrono::Local;
 use crate::metrics::PerformanceMetrics;
 use crate::tier::{current_tier, Tier};
 
@@ -113,7 +112,7 @@ pub fn export_performance_csv(
 
     // Check for F6 trigger
     if keyboard.just_pressed(KeyCode::F6) {
-        let timestamp = Local::now().format("%Y%m%d_%H%M%S");
+        let timestamp = chrono::Local::now().format("%Y%m%d_%H%M%S");
         let filename = format!("perf_export_{}.csv", timestamp);
         
         match File::create(&filename) {
