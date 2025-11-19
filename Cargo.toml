@@ -15,8 +15,15 @@ wgpu = { workspace = true }
 pollster = "0.3"
 chrono = "0.4"
 
+[dev-dependencies]
+criterion = "0.5"
+
 [lints]
 workspace = true
+
+[[bench]]
+name = "visibility_bench"
+harness = false
 
 [[example]]
 name = "simple_voxel_world"
