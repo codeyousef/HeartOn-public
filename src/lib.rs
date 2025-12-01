@@ -12,6 +12,8 @@ pub mod hud;
 pub mod metrics;
 pub mod platform;
 pub mod plugin;
+pub mod postfx;
+pub mod replay;
 pub mod simd;
 pub mod tier;
 pub mod voxel;
