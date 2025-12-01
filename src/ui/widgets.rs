@@ -26,7 +26,7 @@ impl HeartOnButtonBundle {
             button: ButtonBundle {
                 style: super::theme::button_style(),
                 background_color: theme.primary_color.into(),
-                image: UiImage::default().with_color(theme.primary_color),
+                image: UiImage::default(),
                 ..default()
             },
             marker: HeartOnButton,

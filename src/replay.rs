@@ -87,18 +87,18 @@ impl Replay {
         let content =
             fs::read_to_string(path).map_err(|e| format!("Failed to read replay file: {}", e))?;
 
-        ron::from_str(&content).map_err(|e| format!("Failed to parse replay file: {}", e))
+        bevy::scene::ron::from_str(&content).map_err(|e| format!("Failed to parse replay file: {}", e))
     }
 }
 
 // System to record camera path
 pub fn record_camera_path(
-    time: Res<Time>,
+    frame_count: Res<bevy::core::FrameCount>,
     mut replay: ResMut<Replay>,
     query: Query<(&Transform, &Camera)>,
 ) {
     if let Ok((transform, _)) = query.get_single() {
-        let frame = time.frame_count() as u32;
+        let frame = frame_count.0;
         replay.add_camera_frame(
             frame,
             transform.translation.to_array(),
@@ -109,11 +109,11 @@ pub fn record_camera_path(
 
 // System to playback camera path
 pub fn playback_camera_path(
-    time: Res<Time>,
+    frame_count: Res<bevy::core::FrameCount>,
     replay: Res<Replay>,
     mut query: Query<&mut Transform, With<Camera>>,
 ) {
-    let frame = time.frame_count() as u32;
+    let frame = frame_count.0;
     // Simple linear search for now, optimize later
     if let Some(frame_data) = replay.camera_frames.iter().find(|f| f.frame == frame) {
         if let Ok(mut transform) = query.get_single_mut() {
