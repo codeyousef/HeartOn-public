@@ -16,6 +16,8 @@ pub mod postfx;
 pub mod replay;
 pub mod simd;
 pub mod tier;
+pub mod ui;
+pub mod audio;
 pub mod voxel;
 
 /// Re-export Bevy for convenience
