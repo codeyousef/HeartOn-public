@@ -19,14 +19,49 @@ pub fn render_dummy_voxels(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    voxel_scenes: Query<(Entity, &Handle<crate::voxel::VoxelScene>), Added<Handle<crate::voxel::VoxelScene>>>,
+    // Query for new entities or entities with changed handles
+    changed_scenes: Query<(Entity, &Handle<crate::voxel::VoxelScene>), Changed<Handle<crate::voxel::VoxelScene>>>,
+    // Query for all scenes to check against asset events
+    all_scenes: Query<(Entity, &Handle<crate::voxel::VoxelScene>)>,
     scenes: Res<Assets<crate::voxel::VoxelScene>>,
+    mut asset_events: EventReader<AssetEvent<crate::voxel::VoxelScene>>,
+    // Query to find existing instances to despawn
+    instances: Query<(Entity, &VoxelInstance)>,
     mut metrics: ResMut<crate::metrics::PerformanceMetrics>,
 ) {
-    for (entity, scene_handle) in &voxel_scenes {
-        let Some(scene) = scenes.get(scene_handle) else { 
-            continue;
-        };
+    let mut entities_to_update = std::collections::HashSet::new();
+
+    // 1. Handle new/changed components
+    for (entity, _) in &changed_scenes {
+        entities_to_update.insert(entity);
+    }
+
+    // 2. Handle modified assets
+    for event in asset_events.read() {
+        if let AssetEvent::Modified { id } = event {
+            for (entity, handle) in &all_scenes {
+                if handle.id() == *id {
+                    entities_to_update.insert(entity);
+                }
+            }
+        }
+    }
+
+    if entities_to_update.is_empty() {
+        return;
+    }
+
+    // 3. Despawn old instances for updated entities
+    for (instance_entity, instance) in &instances {
+        if entities_to_update.contains(&instance.parent) {
+            commands.entity(instance_entity).despawn();
+        }
+    }
+
+    // 4. Spawn new instances
+    for entity in entities_to_update {
+        let Ok((_, handle)) = all_scenes.get(entity) else { continue };
+        let Some(scene) = scenes.get(handle) else { continue };
         
         let voxel_count = scene.voxel_count();
         

@@ -19,6 +19,7 @@ pub mod tier;
 pub mod ui;
 pub mod audio;
 pub mod voxel;
+pub mod config;
 
 /// Re-export Bevy for convenience
 pub use bevy;

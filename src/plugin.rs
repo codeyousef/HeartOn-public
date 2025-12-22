@@ -53,11 +53,29 @@ impl Plugin for HeartOnPublicPlugin {
         // Register resources
         app.init_resource::<crate::capabilities::GpuCapabilities>()
             .init_resource::<crate::metrics::PerformanceMetrics>()
-            .init_resource::<crate::debug::DebugState>();
+            .init_resource::<crate::debug::DebugState>()
+            .init_resource::<crate::tier::RevenueReportingConfig>()
+            .register_type::<crate::tier::RevenueReportingConfig>()
+            .init_resource::<crate::config::HeartOnConfig>()
+            .register_type::<crate::config::HeartOnConfig>();
+
+        // Validate configuration
+        if let Some(config) = app.world.get_resource::<crate::config::HeartOnConfig>() {
+            if let Err(e) = config.validate() {
+                error!("Invalid HeartOn configuration: {}", e);
+            } else {
+                info!("Configuration validated: {:?}", config.quality_level);
+            }
+        }
 
         // Register assets
         app.init_asset::<crate::voxel::VoxelScene>()
             .init_asset_loader::<crate::voxel::VoxelSceneLoader>();
+
+        // Add Egui Plugin
+        if !app.is_plugin_added::<bevy_egui::EguiPlugin>() {
+            app.add_plugins(bevy_egui::EguiPlugin);
+        }
 
         // Insert config as resource for systems to access
         app.insert_resource(self.config.clone());

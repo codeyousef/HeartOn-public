@@ -100,6 +100,87 @@ impl VoxelScene {
         }
         Ok(())
     }
+
+    /// Add or update a voxel in the scene
+    pub fn add_voxel(&mut self, voxel: Voxel) -> Result<(), String> {
+        match &mut self.voxel_data {
+            VoxelData::Community(data) => {
+                // Check if voxel already exists at this position
+                if let Some(idx) = data.voxels.iter().position(|v| v.position == voxel.position) {
+                    // Update existing
+                    data.voxels[idx] = voxel;
+                } else {
+                    // Add new
+                    data.voxels.push(voxel);
+                    self.metadata.voxel_count += 1;
+                }
+                Ok(())
+            }
+            VoxelData::Professional(_) => Err("Cannot modify Professional tier voxel data".to_string()),
+        }
+    }
+
+    /// Remove a voxel at the given position
+    pub fn remove_voxel(&mut self, position: [u16; 3]) -> Result<bool, String> {
+        match &mut self.voxel_data {
+            VoxelData::Community(data) => {
+                if let Some(idx) = data.voxels.iter().position(|v| v.position == position) {
+                    data.voxels.swap_remove(idx);
+                    self.metadata.voxel_count -= 1;
+                    Ok(true)
+                } else {
+                    Ok(false)
+                }
+            }
+            VoxelData::Professional(_) => Err("Cannot modify Professional tier voxel data".to_string()),
+        }
+    }
+
+    /// Serialize to .hvox format
+    pub fn to_hvox(&self) -> Result<Vec<u8>, String> {
+        let mut bytes = Vec::new();
+        
+        // Magic header
+        bytes.extend_from_slice(b"HVOX");
+        
+        // Version
+        bytes.extend_from_slice(&1u32.to_le_bytes());
+        
+        // Dimensions
+        bytes.extend_from_slice(&self.metadata.dimensions.0.to_le_bytes());
+        bytes.extend_from_slice(&self.metadata.dimensions.1.to_le_bytes());
+        bytes.extend_from_slice(&self.metadata.dimensions.2.to_le_bytes());
+        
+        // Voxel count
+        bytes.extend_from_slice(&(self.voxel_count() as u32).to_le_bytes());
+        
+        // Origin
+        bytes.extend_from_slice(&self.metadata.origin.x.to_le_bytes());
+        bytes.extend_from_slice(&self.metadata.origin.y.to_le_bytes());
+        bytes.extend_from_slice(&self.metadata.origin.z.to_le_bytes());
+        
+        // Name (28 bytes, null-terminated)
+        let name_bytes = self.metadata.name.as_bytes();
+        let len = name_bytes.len().min(27);
+        bytes.extend_from_slice(&name_bytes[..len]);
+        bytes.resize(64, 0); // Pad to header size
+        
+        // Voxel data
+        match &self.voxel_data {
+            VoxelData::Community(data) => {
+                for voxel in &data.voxels {
+                    bytes.extend_from_slice(&voxel.position[0].to_le_bytes());
+                    bytes.extend_from_slice(&voxel.position[1].to_le_bytes());
+                    bytes.extend_from_slice(&voxel.position[2].to_le_bytes());
+                    bytes.extend_from_slice(&voxel.color);
+                    bytes.push(voxel.material_id);
+                }
+            }
+            VoxelData::Professional(_) => return Err("Cannot serialize Professional tier data yet".to_string()),
+        }
+        
+        Ok(bytes)
+    }
     
     /// Create a simple test scene
     pub fn test_cube(size: u16) -> Self {
@@ -169,5 +250,52 @@ mod tests {
         };
         
         assert!(scene.validate_tier().is_err());
+    }
+
+    #[test]
+    fn test_voxel_modification() {
+        let mut scene = VoxelScene::test_cube(1); // 1 voxel at 0,0,0
+        assert_eq!(scene.voxel_count(), 1);
+        
+        // Add new voxel
+        let new_voxel = Voxel {
+            position: [1, 1, 1],
+            color: [255, 0, 0, 255],
+            material_id: 1,
+        };
+        scene.add_voxel(new_voxel).unwrap();
+        assert_eq!(scene.voxel_count(), 2);
+        
+        // Update existing voxel
+        let updated_voxel = Voxel {
+            position: [0, 0, 0],
+            color: [0, 255, 0, 255],
+            material_id: 2,
+        };
+        scene.add_voxel(updated_voxel).unwrap();
+        assert_eq!(scene.voxel_count(), 2); // Count shouldn't change
+        
+        if let VoxelData::Community(data) = &scene.voxel_data {
+            let v = data.voxels.iter().find(|v| v.position == [0, 0, 0]).unwrap();
+            assert_eq!(v.color, [0, 255, 0, 255]);
+            assert_eq!(v.material_id, 2);
+        }
+        
+        // Remove voxel
+        assert!(scene.remove_voxel([1, 1, 1]).unwrap());
+        assert_eq!(scene.voxel_count(), 1);
+        
+        // Remove non-existent voxel
+        assert!(!scene.remove_voxel([5, 5, 5]).unwrap());
+        assert_eq!(scene.voxel_count(), 1);
+    }
+
+    #[test]
+    fn test_serialization() {
+        let scene = VoxelScene::test_cube(2); // 8 voxels
+        let bytes = scene.to_hvox().unwrap();
+        
+        assert_eq!(&bytes[0..4], b"HVOX");
+        assert_eq!(bytes.len(), 64 + 8 * 11); // Header + 8 voxels * 11 bytes
     }
 }

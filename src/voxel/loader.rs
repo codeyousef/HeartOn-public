@@ -145,14 +145,14 @@ fn parse_hvox_metadata(header: &[u8]) -> Result<VoxelMetadata, VoxelLoaderError>
 
 /// Parse voxel array from data bytes
 fn parse_hvox_voxels(data: &[u8], expected_count: usize) -> Result<Vec<Voxel>, VoxelLoaderError> {
-    // Voxel layout: 10 bytes per voxel
+    // Voxel layout: 11 bytes per voxel
     // 0-1: x position (u16 LE)
     // 2-3: y position (u16 LE)
     // 4-5: z position (u16 LE)
     // 6-9: RGBA color (4x u8)
-    // 9: material_id (u8)
+    // 10: material_id (u8)
     
-    const VOXEL_SIZE: usize = 10;
+    const VOXEL_SIZE: usize = 11;
     let expected_size = expected_count * VOXEL_SIZE;
     
     if data.len() < expected_size {
@@ -175,7 +175,7 @@ fn parse_hvox_voxels(data: &[u8], expected_count: usize) -> Result<Vec<Voxel>, V
                 u16::from_le_bytes([chunk[4], chunk[5]]),
             ],
             color: [chunk[6], chunk[7], chunk[8], chunk[9]],
-            material_id: chunk[9],
+            material_id: chunk[10],
         });
     }
     
@@ -250,6 +250,7 @@ mod tests {
         if let VoxelData::Community(data) = &scene.voxel_data {
             assert_eq!(data.voxels[0].position, [5, 10, 15]);
             assert_eq!(data.voxels[0].color, [255, 128, 64, 255]);
+            assert_eq!(data.voxels[0].material_id, 1);
         }
     }
 

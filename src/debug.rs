@@ -207,23 +207,23 @@ mod tests {
         app.add_systems(Update, update_debug_notification);
 
         // Set notification
-        app.world_mut().resource_mut::<DebugState>().set_notification("Test".to_string());
-        assert!(app.world().resource::<DebugState>().notification.is_some());
+        app.world.resource_mut::<DebugState>().set_notification("Test".to_string());
+        assert!(app.world.resource::<DebugState>().notification.is_some());
 
         // Advance time by 2 seconds
         {
-            let mut time = app.world_mut().resource_mut::<Time>();
+            let mut time = app.world.resource_mut::<Time>();
             time.advance_by(std::time::Duration::from_secs(2));
         }
         app.update();
-        assert!(app.world().resource::<DebugState>().notification.is_some());
+        assert!(app.world.resource::<DebugState>().notification.is_some());
 
         // Advance time by another 2 seconds (total 4 > 3)
         {
-            let mut time = app.world_mut().resource_mut::<Time>();
+            let mut time = app.world.resource_mut::<Time>();
             time.advance_by(std::time::Duration::from_secs(2));
         }
         app.update();
-        assert!(app.world().resource::<DebugState>().notification.is_none());
+        assert!(app.world.resource::<DebugState>().notification.is_none());
     }
 }
